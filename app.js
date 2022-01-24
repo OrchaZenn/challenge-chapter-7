@@ -4,12 +4,12 @@ const app = express() // create server
 const { v4: uuidv4 } = require('uuid')
 const fs = require('fs')
 
-
+app.use(express.static('public'))
 // ejs -> view engine
 app.set('view engine', 'ejs')
 app.set('views', './views')
 // utk share file secara public
-app.use(express.static('public'))
+
 
 // ngambil dari request body
 app.use(express.json()) // parsing req.body bentukan json
@@ -21,62 +21,55 @@ const v1 = express.Router()
 app.use('/api', apiRouter)
 apiRouter.use('/v1', v1)
 
-//Get UserData
-// const dataUser = fs.readFileSync('./data/users.json', 'utf-8')
-
 // index page
 app.get('/', (req, res) => {
   res.render('index')
-  res.status(200).send()
 })
 
 // Signin Page
 app.get('/signin', (req, res) => {
   res.render('signin')
-  res.status(200).send()
 })
 
 //Signup Page
 app.get('/signup', (req, res) => {
   res.render('signup')
-  res.status(200).send()
 })
 
 //Games page
 app.get('/games', (req, res) => {
   res.render('games')
-  res.status(200).send()
 })
 
 // v1 -> backend
 //signup route
 v1.post('/signup', (req, res) => {
+  console.log(req.body)
   const dataUser = fs.readFileSync('data/users.json', 'utf-8')
-  const dataParsed = JSON.parse(dataUser)
-  const { username, password } = req.body
+  const parsedUser = JSON.parse(dataUser)
   const newUser = {
-    id: uuidv4(),
-    username,
-    password
+    username: req.body.username,
+    password: req.body.password
   }
-  dataParsed.push(newUser)
-  fs.writeFileSync('./data/users.json', JSON.stringify(dataParsed, null, 4))
-  res.status(201).send().redirect('/')
-})
+  console.log(req.body)
+  parsedUser.push(newUser)
+  fs.writeFileSync('./data/users.json', JSON.stringify(parsedUser, null, 4))
+  return res.status(201).send().redirect('/')
+  })
+
 
 //signin route     
 v1.post('/signin', (req, res) => {
   const dataUser = fs.readFileSync('data/users.json', 'utf-8')
   const parsedUser = JSON.parse(dataUser) //Parse JSON data
-  const userValid = data.find((value) => value.username == username)
-  if(!userValid){
+  const userValidation = parsedUser.find(value => value.username == req.body.username)
+  if(!userValidation){
     res.status(404).send('Cannot Find User')
   }
   else{
     res.status(201).send('Login Successful')
     return res.redirect('/')
-    res.end()
-  }
+    }
 })
 
 
