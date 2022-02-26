@@ -1,9 +1,33 @@
 {
   "dependencies": {
     "body-parser": "^1.19.1",
+    "dotenv": "^16.0.0",
     "ejs": "^3.1.6",
     "express": "^4.17.2",
     "nodemon": "^2.0.15",
+    "pg": "^8.7.3",
+    "sequelize": "^6.16.1",
     "uuid": "^8.3.2"
+  },
+  "name": "the-game",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OrchaZenn/challenge-chapter-5.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OrchaZenn/challenge-chapter-5/issues"
+  },
+  "homepage": "https://github.com/OrchaZenn/challenge-chapter-5#readme",
+  "description": "",
+  "devDependencies": {
+    "sequelize-cli": "^6.4.1"
   }
 }

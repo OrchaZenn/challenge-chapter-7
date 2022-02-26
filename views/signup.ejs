@@ -16,13 +16,25 @@
 
 <body>
 <div class="signup-form">	
-    <form action="/api/v1/signup" method="post">
+    <form action="/signup" method="post">
 		<h2>Create Account</h2>
 		<p class="lead">Ga Lama koq paling lama 1 Menit</p>
+		<div class="form-group">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-user"></i></span>
+				<input type="text" class="form-control" name="name" placeholder="Fullname" required="required">
+			</div>
+        </div>
         <div class="form-group">
 			<div class="input-group">
 				<span class="input-group-addon"><i class="fa fa-user"></i></span>
 				<input type="text" class="form-control" name="username" placeholder="Username" required="required">
+			</div>
+        </div>
+		<div class="form-group">
+			<div class="input-group">
+				<span class="input-group-addon"><i class="fa fa-user"></i></span>
+				<input type="text" class="form-control" name="email" placeholder="Email" required="required">
 			</div>
         </div>
 		<div class="form-group">
@@ -36,6 +48,12 @@
         </div>
 		<p class="small text-center">Dengan Klik Sign Up button, anda setuju dengan <br><a href="#">Terms &amp; Conditions</a> dan <a href="#">Privacy Policy</a>.</p>
     </form>
+		<button
+        onclick="goBack()"
+        style="display: block; margin: auto auto; margin-top: 10px"
+      >
+        Go Back
+      </button>
 	<div class="text-center">Sudah Punya account? <a href="/signin">Login here</a>.</div>
 </div>
 <script src="../app.js"></script>
