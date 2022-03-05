@@ -1,2 +1,2 @@
-# challenge-chapter-6
-Need Future Updates after some improvements
+# challenge-chapter-7
+Update di Chapter 7
