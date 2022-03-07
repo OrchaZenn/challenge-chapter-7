@@ -9,24 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
      static associate(models) {
       // define association here
-      UserGame.hasOne(models.UserGameBiodata, {
-        as: 'UserGameBiodata',
-        foreignKey: 'user_id',
-        sourceKey: 'id',
-      });
-      UserGame.hasMany(models.UserGameBiodata, {
-        foreignKey: "user_id",
-      });
-      UserGame.hasMany(models.UserGameHistory, {
-        foreignKey: "user_id",
-      });
+      UserGame.hasMany(models.UserBiodata)
     }
-  }
+  };
   UserGame.init(
     {
       email: DataTypes.STRING,
       username: DataTypes.STRING,
       password: DataTypes.STRING,
+      role: DataTypes.STRING
     },
     {
       sequelize,

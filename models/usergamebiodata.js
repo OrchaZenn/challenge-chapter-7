@@ -9,17 +9,26 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      UserGameBiodata.belongsTo(models.UserGame, {
-        foreignKey: 'user_id',
-        onDelete: "CASCADE",
-      });
+      UserGameBiodata.belongsTo(models.UserGame);
     }
   }
   UserGameBiodata.init(
     {
       name: DataTypes.STRING,
-      user_id: DataTypes.INTEGER,
-      email: DataTypes.STRING,
+      gender: {
+        type: DataTypes.STRING,
+        values: ["Male", "Female", "null"],
+        validate: {
+          isIn: [["male", "female", "null"]],
+        }
+      },
+      status: DataTypes.STRING,
+      UserId: {
+        type: DataTypes.INTEGER,
+        validate: {
+          notEmpty: true
+        }
+      }
     },
     {
       sequelize,

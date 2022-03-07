@@ -8,9 +8,4 @@ router.use('/auth', authRouter)
 router.use("/biodata", biodataRouter)
 router.use("/user", userRouter)
 
-// "/"
-router.get("/", (req, res) => {
-  res.render("home")
-})
-
 module.exports = router

@@ -12,6 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   UserGameHistory.init({
+    username: DataTypes.STRING,
     result: DataTypes.STRING
   }, {
     sequelize,
