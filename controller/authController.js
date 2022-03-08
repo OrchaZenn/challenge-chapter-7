@@ -1,82 +1,76 @@
-const bcrypt = require('bcrypt')
-const auth = require('../middlewares/authentication')
-const { UserGame, UserGameBiodata } = require('../models')
+const { User, UserBiodata } = require("../models")
+const { hashPassword, verifyPassword } = require("../helpers/passwordHandler")
+const { generateToken } = require("../helpers/tokenHandler")
 
-class authController {
-  //SignUp
-  static postSignup = async (req, res) => {
+class AuthController {
+  /**
+   * for register purpose we will register user with these requirements
+   * 
+   * @body { username, email, password, role } req 
+   * @json { username, email, role } res 
+   */
+  static register = async (req, res) => {
     try {
-      const { name, email, username, password } = req.body;
+      const { username, email, password, role } = req.body
 
-      // Check email is already in database
-      const isEmailExist = await UserGame.findOne({ where: { email } });
-      if (isEmailExist) return res.status(409).json({ message: 'Email is already taken.' });
+      const isEmailExist = await User.findOne({ where: { email } })
+      if (isEmailExist) return res.status(409).json({ message: "Email is already taken" })
+      const isUsernameExist = await User.findOne({ where: { username } })
+      if (isUsernameExist) return res.status(409).json({ message: "Username is already exists" })
 
-      // Check username is already in database
-      const isUsernameExist = await UserGame.findOne({ where: { username } });
-      if (isUsernameExist) return res.status(409).json({ message: 'Username is already taken.' });
+      const payload = {
+        username, email, password: hashPassword(password), role
+      }
+      const user = await User.create(payload)
 
-      // Hashing Password
-      const hashedPassword = await bcrypt.hash(password, 10);
 
-      return await UserGame.create({
-        email,
-        username,
-        password: hashedPassword
+      if (user) {
+        const biodata = await UserBiodata.create({ name: username, UserId: user.id })
+        if (biodata) {
+          return res.status(201).json({
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            biodata
+          })
+        }
+      } else if (!user) {
+        res.status(400).json({ message: "bad request" })
+      }
+
+    } catch (error) {
+      return res.status(500).json({ message: error.message })
+    }
+  }
+
+  static login = async (req, res, next) => {
+    try {
+      const { username, password } = req.body
+      const user = await User.findOne({
+        where: {
+          username: username
+        }
       })
-        .then((data) => UserGameBiodata.create({
-          userId: data.userId,
-          name,
-        }))
-        .then((user) => res.status(201).json({ status: 201, message: `User ${user.userId} added.`, user }))
-        .catch((e) => res.status(500).json({ message: 'Failed to signup.' }));
-    } catch {
-      return res.status(500).json({ message: 'Failed to signup.' });
+      if (!user) return res.status(404).json({ message: "User not found" })
+      const isPasswordMatch = await verifyPassword(password, user.password)
+      if (!isPasswordMatch) return res.status(409).json({ message: "Password salah" })
+      const access_token = await generateToken({
+        id: user.id,
+        email: user.email
+      })
+      res.cookie("UserId", user.id, {
+        httpOnly: true
+      })
+      res.cookie("access_token", access_token, {
+        httpOnly: true
+      })
+      return res.status(200).json({
+        id: user.id,
+        username: user.username,
+        message: `user ${username}, berhasil login`
+      })
+    } catch (error) {
+      return res.status(500).json({ message: error })
     }
-  };
-
-  //Signin 
-  static postLogin = async (req, res) => {
-    try {
-      const { username, password } = req.body;
-
-      // Check stored username from database
-      const isUserValid = await UserGame.findOne({ where: { username } });
-      if (!isUserValid) return res.status(401).json({ message: 'Username salah' });
-
-      // Check password from username and compare
-      const isPasswordValid = await bcrypt.compare(password, isUserValid.password);
-      if (!isPasswordValid) return res.status(401).json({ message: 'Password salah' });
-
-      const COOKIE_OPTION = {
-        httpOnly: true,
-        maxAge: 2 * 60 * 60 * 1000,
-        sameSite: true,
-        secure: false,
-      };
-
-      return auth.jwtAuth.sign(
-        {
-          userId: isUserValid.userId,
-          username: isUserValid.username,
-        },
-        (token) => res.status(200)
-          .cookie('username', username, COOKIE_OPTION)
-          .cookie(process.env.TOKEN_COOKIE, `Bearer ${token}`, COOKIE_OPTION)
-          .json({
-            status: 200, message: `User ${isUserValid.username} login.`, userId: isUserValid.userId, username: isUserValid.username, token,
-          }),
-        () => res.status(500).json({ message: 'Internal Server Error.' }),
-      );
-    } catch {
-      return res.status(500).json({ status: 500, message: 'Internal Server Error.' });
-    }
-  };
-
-  //Logout
-  static logout = (req, res) => {
-    res.status(200).json({ status: 200, message: 'Session akan deleted.' });
-  };
+  }
 }
-
-export default authController;
